@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { addUser } from './utils/userSlice'
 
 export const Login = () => {
   const [emailId, setEmailId] = useState('')
@@ -14,8 +16,8 @@ export const Login = () => {
       }, {
         withCredentials: true
       })
-      console.log('Login successful:', response.data.user)
-      dispatch(addUser(response.data.user))
+      console.log('Login successful:', response.data)
+      dispatch(addUser(response.data))
     } catch (error) {
       console.error('Error logging in:', error)
     }
