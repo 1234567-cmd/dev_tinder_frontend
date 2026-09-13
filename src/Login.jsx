@@ -4,6 +4,7 @@ import axios from 'axios'
 export const Login = () => {
   const [emailId, setEmailId] = useState('')
   const [password, setPassword] = useState('')
+  const dispatch = useDispatch()
 
   const handleLogin = async () => {
     try{
@@ -13,6 +14,8 @@ export const Login = () => {
       }, {
         withCredentials: true
       })
+      console.log('Login successful:', response.data.user)
+      dispatch(addUser(response.data.user))
     } catch (error) {
       console.error('Error logging in:', error)
     }
