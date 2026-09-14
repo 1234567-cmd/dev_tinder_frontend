@@ -3,19 +3,25 @@ import { useSelector } from 'react-redux';
 
 export const NavBar = () => {
 
-  const user = useSelector((state) => state.user);
+  // Slice state is { user: { data: <user> } } — both /login and /profile/view wrap the user in `data`.
+  const user = useSelector((state) => state.user.user?.data);
   return (
     <div className="navbar bg-base-300 shadow-sm">
       <div className="flex-1">
         <a className="btn btn-ghost text-xl">DevTinder</a>
       </div>
-      <div className="flex gap-2 mr-5">
+      <div className="flex items-center gap-3 mr-5">
+        {user && (
+          <p className="hidden sm:block text-base text-base-content/70">
+            Welcome, <span className="font-semibold text-base-content">{user.firstName}</span>
+          </p>
+        )}
         {user && (
           <div className="dropdown dropdown-end">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-              <div className="w-10 rounded-full ">
+              <div className="w-10 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-300">
                 <img
-                  alt="Tailwind CSS Navbar component"
+                  alt={`${user.firstName}'s profile photo`}
                   src={user.photoUrl} />
               </div>
             </div>
