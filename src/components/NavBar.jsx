@@ -2,9 +2,10 @@ import React from 'react'
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { BASE_URL } from '../utils/constants';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { removeUser } from '../utils/userSlice';
+import { showToast } from '../utils/toastSlice';
 
 export const NavBar = () => {
   const navigate = useNavigate();
@@ -15,10 +16,12 @@ export const NavBar = () => {
       const res= await axios.post (`${BASE_URL}/logout`, {}, { withCredentials: true });
       if (res.status === 200) {
         dispatch(removeUser());
+        dispatch(showToast('Logged out successfully'));
         navigate('/login');
       }
     } catch (error) {
       console.error('Error logging out:', error);
+      dispatch(showToast('Logout failed. Please try again.', 'error'));
     }
   }
 
@@ -51,10 +54,10 @@ export const NavBar = () => {
               tabIndex={-1}
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
               <li>
-                <a className="justify-between">
+                <Link to="/profile" className="justify-between">
                   Profile
                   <span className="badge">New</span>
-                </a>
+                </Link>
               </li>
               <li><a>Settings</a></li>
               <li><a onClick={handleLogout}>Logout</a></li>

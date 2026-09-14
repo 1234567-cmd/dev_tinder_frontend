@@ -2,6 +2,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { NavBar } from './NavBar'
 import { Footer } from './Footer'
+import { Toast } from './Toast'
 import { BASE_URL } from '../utils/constants'
 import axios from 'axios'
 import { useEffect } from 'react'
@@ -33,6 +34,8 @@ export const Body = () => {
         <Outlet />
       </main>
       <Footer />
+      {/* Lives here so toasts stay visible while moving between pages. */}
+      <Toast />
     </div>
   )
 }

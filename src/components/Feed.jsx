@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux'
 import { BASE_URL } from '../utils/constants'
 import { setFeed } from '../utils/feedSlice'
+import { showToast } from '../utils/toastSlice'
 import { UserCard } from './UserCard'
 
 export const Feed = () => {
@@ -19,6 +20,7 @@ export const Feed = () => {
       dispatch(setFeed(res.data.feed));
     } catch (error) {
       console.error('Error fetching feed:', error);
+      dispatch(showToast('Could not load your feed. Please try again.', 'error'));
     }
   };
 

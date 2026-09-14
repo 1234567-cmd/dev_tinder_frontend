@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { addUser } from '../utils/userSlice'
+import { showToast } from '../utils/toastSlice'
 import { useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../utils/constants'
 
@@ -21,9 +22,11 @@ export const Login = () => {
       })
       console.log('Login successful:', response.data)
       dispatch(addUser(response.data))
+      dispatch(showToast(`Welcome back, ${response.data.data.firstName}!`))
       navigate('/feed')
     } catch (error) {
       console.error('Error logging in:', error)
+      dispatch(showToast(error.response?.data?.message || 'Login failed. Please try again.', 'error'))
     }
   }
 
