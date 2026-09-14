@@ -1,7 +1,29 @@
 import React from 'react'
 import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { BASE_URL } from '../utils/constants';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { removeUser } from '../utils/userSlice';
 
 export const NavBar = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    try {
+      const res= await axios.post (`${BASE_URL}/logout`, {}, { withCredentials: true });
+      if (res.status === 200) {
+        dispatch(removeUser());
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  }
+
+
+
 
   // Slice state is { user: { data: <user> } } — both /login and /profile/view wrap the user in `data`.
   const user = useSelector((state) => state.user.user?.data);
@@ -35,7 +57,7 @@ export const NavBar = () => {
                 </a>
               </li>
               <li><a>Settings</a></li>
-              <li><a>Logout</a></li>
+              <li><a onClick={handleLogout}>Logout</a></li>
             </ul>
           </div>
         )}
