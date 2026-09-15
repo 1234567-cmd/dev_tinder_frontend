@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { addUser } from '../utils/userSlice'
 import { showToast } from '../utils/toastSlice'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../utils/constants'
 
 export const Login = () => {
@@ -63,6 +63,11 @@ export const Login = () => {
               Login
             </button>
           </div>
+
+          <p className="text-center text-sm mt-2">
+            New to DevTinder?{' '}
+            <Link to="/signup" className="link link-primary">Sign up</Link>
+          </p>
         </div>
       </div>
     </div>

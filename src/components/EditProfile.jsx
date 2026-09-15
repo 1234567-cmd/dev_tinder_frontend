@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { BASE_URL } from '../utils/constants'
@@ -146,7 +146,7 @@ export const EditProfile = ({ user }) => {
       </div>
 
       <div className="flex flex-col items-center gap-2">
-        <UserCard users={[{ _id: user._id, firstName, lastName, photoUrl, age, gender }]} />
+        <UserCard users={[{ _id: user._id, firstName, lastName, photoUrl, age, gender }]} showActions={false} />
       </div>
     </div>
   )

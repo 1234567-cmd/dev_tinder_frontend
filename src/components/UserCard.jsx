@@ -5,7 +5,8 @@ import { removeUserFromFeed } from '../utils/feedSlice'
 import { showToast } from '../utils/toastSlice'
 
 
-export const UserCard = ({ users }) => {
+// showActions=false hides Reject/Interested, e.g. for the preview of your own card on the profile page.
+export const UserCard = ({ users, showActions = true }) => {
   const dispatch = useDispatch()
 
   // status must be one the backend accepts for /request/send: "ignored" or "interested".
@@ -93,16 +94,18 @@ export const UserCard = ({ users }) => {
                 </div>
               </figure>
 
-              <div className="card-body p-4">
-                <div className="card-actions flex-nowrap justify-center gap-3">
-                  <button className="btn btn-outline btn-error flex-1 rounded-full" onClick={() => sendRequest('ignored', _id, firstName)}>
-                    ✕ Reject
-                  </button>
-                  <button className="btn btn-success flex-1 rounded-full" onClick={() => sendRequest('interested', _id, firstName)}>
-                    ♥ Interested
-                  </button>
+              {showActions && (
+                <div className="card-body p-4">
+                  <div className="card-actions flex-nowrap justify-center gap-3">
+                    <button className="btn btn-outline btn-error flex-1 rounded-full" onClick={() => sendRequest('ignored', _id, firstName)}>
+                      ✕ Reject
+                    </button>
+                    <button className="btn btn-success flex-1 rounded-full" onClick={() => sendRequest('interested', _id, firstName)}>
+                      ♥ Interested
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )
