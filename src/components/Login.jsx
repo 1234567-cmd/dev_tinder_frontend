@@ -5,6 +5,7 @@ import { addUser } from '../utils/userSlice'
 import { showToast } from '../utils/toastSlice'
 import { Link, useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../utils/constants'
+import { PasswordInput } from './PasswordInput'
 
 export const Login = () => {
   const [emailId, setEmailId] = useState('')
@@ -53,9 +54,7 @@ export const Login = () => {
 
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Password</legend>
-            <input
-              type="password"
-              className="input w-full"
+            <PasswordInput
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

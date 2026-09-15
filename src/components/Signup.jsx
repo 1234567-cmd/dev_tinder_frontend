@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../utils/constants'
 import { addUser } from '../utils/userSlice'
 import { showToast } from '../utils/toastSlice'
+import { PasswordInput } from './PasswordInput'
 
 export const Signup = () => {
   const [firstName, setFirstName] = useState('')
@@ -98,9 +99,7 @@ export const Signup = () => {
 
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Password</legend>
-            <input
-              type="password"
-              className="input w-full"
+            <PasswordInput
               placeholder="Create a password"
               required
               minLength={8}
