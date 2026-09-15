@@ -13,7 +13,10 @@ export const feedSlice = createSlice({
         clearFeed: (state) => {
             state.feed = [];
         },
+        removeUserFromFeed: (state, action) => {
+            state.feed = state.feed.filter((user) => user._id !== action.payload);
+        },
     },
 });
 
-export const { setFeed, clearFeed } = feedSlice.actions;
+export const { setFeed, clearFeed, removeUserFromFeed } = feedSlice.actions;
