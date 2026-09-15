@@ -1,27 +1,34 @@
-import React from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { BASE_URL } from '../utils/constants';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { removeUser } from '../utils/userSlice';
+import { clearFeed } from '../utils/feedSlice';
 import { showToast } from '../utils/toastSlice';
 
 export const NavBar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    setLoggingOut(true);
     try {
       const res= await axios.post (`${BASE_URL}/logout`, {}, { withCredentials: true });
       if (res.status === 200) {
         dispatch(removeUser());
+        // Otherwise the next account to log in or sign up is shown this user's cached feed.
+        dispatch(clearFeed());
         dispatch(showToast('Logged out successfully'));
         navigate('/login');
       }
     } catch (error) {
       console.error('Error logging out:', error);
       dispatch(showToast('Logout failed. Please try again.', 'error'));
+    } finally {
+      setLoggingOut(false);
     }
   }
 
@@ -61,7 +68,12 @@ export const NavBar = () => {
               </li>
               <li><Link to="/connections">Connections</Link></li>
               <li><Link to="/requests">Requests</Link></li>
-              <li><a onClick={handleLogout}>Logout</a></li>
+              <li>
+                <button onClick={handleLogout} disabled={loggingOut}>
+                  {loggingOut && <span className="loading loading-spinner loading-xs"></span>}
+                  Logout
+                </button>
+              </li>
             </ul>
           </div>
         )}

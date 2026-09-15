@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { BASE_URL } from '../utils/constants'
 import { removeUserFromFeed } from '../utils/feedSlice'
@@ -8,9 +9,12 @@ import { showToast } from '../utils/toastSlice'
 // showActions=false hides Reject/Interested, e.g. for the preview of your own card on the profile page.
 export const UserCard = ({ users, showActions = true }) => {
   const dispatch = useDispatch()
+  // { userId, status } of the request in flight, so only that card's clicked button shows a spinner.
+  const [pending, setPending] = useState(null)
 
   // status must be one the backend accepts for /request/send: "ignored" or "interested".
   const sendRequest = async (status, userId, firstName) => {
+    setPending({ userId, status })
     try {
       const res = await axios.post(`${BASE_URL}/request/send/${status}/${userId}`, {}, {
         withCredentials: true
@@ -26,6 +30,8 @@ export const UserCard = ({ users, showActions = true }) => {
     } catch (error) {
       console.error('Error sending request:', error)
       dispatch(showToast(error.response?.data?.message || 'Could not send request. Please try again.', 'error'))
+    } finally {
+      setPending(null)
     }
   }
   // scrollIntoView instead of href="#slideX" so the page doesn't jump and the URL doesn't change.
@@ -97,10 +103,24 @@ export const UserCard = ({ users, showActions = true }) => {
               {showActions && (
                 <div className="card-body p-4">
                   <div className="card-actions flex-nowrap justify-center gap-3">
-                    <button className="btn btn-outline btn-error flex-1 rounded-full" onClick={() => sendRequest('ignored', _id, firstName)}>
+                    <button
+                      className="btn btn-outline btn-error flex-1 rounded-full"
+                      onClick={() => sendRequest('ignored', _id, firstName)}
+                      disabled={pending?.userId === _id}
+                    >
+                      {pending?.userId === _id && pending.status === 'ignored' && (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      )}
                       ✕ Reject
                     </button>
-                    <button className="btn btn-success flex-1 rounded-full" onClick={() => sendRequest('interested', _id, firstName)}>
+                    <button
+                      className="btn btn-success flex-1 rounded-full"
+                      onClick={() => sendRequest('interested', _id, firstName)}
+                      disabled={pending?.userId === _id}
+                    >
+                      {pending?.userId === _id && pending.status === 'interested' && (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      )}
                       ♥ Interested
                     </button>
                   </div>

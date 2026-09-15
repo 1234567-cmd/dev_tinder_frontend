@@ -9,10 +9,12 @@ import { BASE_URL } from '../utils/constants'
 export const Login = () => {
   const [emailId, setEmailId] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const handleLogin = async () => {
+    setLoading(true)
     try{
       const response = await axios.post(`${BASE_URL}/login`, {
         emailId,
@@ -27,6 +29,8 @@ export const Login = () => {
     } catch (error) {
       console.error('Error logging in:', error)
       dispatch(showToast(error.response?.data?.message || 'Login failed. Please try again.', 'error'))
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -59,7 +63,8 @@ export const Login = () => {
           </fieldset>
 
           <div className="card-actions justify-center mt-4">
-            <button className="btn btn-primary w-full" onClick={handleLogin}>
+            <button className="btn btn-primary w-full" onClick={handleLogin} disabled={loading}>
+              {loading && <span className="loading loading-spinner loading-sm"></span>}
               Login
             </button>
           </div>

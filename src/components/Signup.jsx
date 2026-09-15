@@ -11,45 +11,47 @@ export const Signup = () => {
   const [lastName, setLastName] = useState('')
   const [emailId, setEmailId] = useState('')
   const [password, setPassword] = useState('')
+  const [photoUrl, setPhotoUrl] = useState('')
+  const [age, setAge] = useState('')
+  const [gender, setGender] = useState('')
+  const [about, setAbout] = useState('')
+  const [skills, setSkills] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  const skillList = skills.split(',').map((s) => s.trim()).filter(Boolean)
 
   const handleSignup = async (e) => {
     e.preventDefault()
     setSubmitting(true)
     try {
-      await axios.post(`${BASE_URL}/signup`, {
-        firstName,
-        lastName,
-        emailId,
-        password
-      }, {
-        withCredentials: true
-      })
+      // The backend rejects an empty photoUrl or gender, so blank optional fields are left out.
+      const payload = { firstName, lastName, emailId, password }
+      if (photoUrl) payload.photoUrl = photoUrl
+      if (age !== '') payload.age = Number(age)
+      if (gender) payload.gender = gender
+      if (about) payload.about = about
+      if (skillList.length > 0) payload.skills = skillList
 
-      // /signup doesn't set the auth cookie, so log in with the same credentials right away.
-      const res = await axios.post(`${BASE_URL}/login`, { emailId, password }, {
+      // /signup sets the auth cookie and replies { message, data: user }, just like /login.
+      const res = await axios.post(`${BASE_URL}/signup`, payload, {
         withCredentials: true
       })
       dispatch(addUser(res.data))
       dispatch(showToast(`Welcome to DevTinder, ${res.data.data.firstName}!`))
-      // New accounts have no photo, age or skills yet — send them to fill those in.
-      navigate('/profile')
+      navigate('/feed')
     } catch (error) {
       console.error('Error signing up:', error)
-      // /signup replies with plain text; /login replies with { message }.
-      const data = error.response?.data
-      const message = typeof data === 'string' && data ? data : data?.message
-      dispatch(showToast(message || 'Signup failed. Please try again.', 'error'))
+      dispatch(showToast(error.response?.data?.message || 'Signup failed. Please try again.', 'error'))
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <div className="flex justify-center my-10">
-      <div className="card bg-base-300 w-96 shadow-sm">
+    <div className="flex justify-center px-4 my-10">
+      <div className="card bg-base-300 w-full max-w-md shadow-sm">
         <form className="card-body" onSubmit={handleSignup}>
           <h2 className="card-title justify-center text-2xl">Sign Up</h2>
 
@@ -108,6 +110,77 @@ export const Signup = () => {
             <p className="label whitespace-normal">
               At least 8 characters with uppercase, lowercase, a number and a symbol
             </p>
+          </fieldset>
+
+          <div className="divider my-1 text-sm text-base-content/60">Profile details (optional)</div>
+
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Photo URL</legend>
+            <input
+              type="url"
+              className="input w-full"
+              placeholder="https://..."
+              value={photoUrl}
+              onChange={(e) => setPhotoUrl(e.target.value)}
+            />
+          </fieldset>
+
+          <div className="grid grid-cols-2 gap-3">
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Age</legend>
+              <input
+                type="number"
+                min="18"
+                className="input w-full"
+                placeholder="18+"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+              />
+            </fieldset>
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Gender</legend>
+              <select
+                className="select w-full"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </fieldset>
+          </div>
+
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">About</legend>
+            <textarea
+              className="textarea w-full h-24"
+              placeholder="Tell other developers about yourself"
+              maxLength={500}
+              value={about}
+              onChange={(e) => setAbout(e.target.value)}
+            />
+            <p className="label justify-end">{about.length} / 500</p>
+          </fieldset>
+
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Skills</legend>
+            <input
+              type="text"
+              className="input w-full"
+              placeholder="React, Node.js, MongoDB"
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
+            />
+            <p className="label">Separate skills with commas (max 10)</p>
+            {skillList.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-1">
+                {skillList.map((skill, index) => (
+                  <span key={`${skill}-${index}`} className="badge badge-primary badge-outline">{skill}</span>
+                ))}
+              </div>
+            )}
           </fieldset>
 
           <div className="card-actions justify-center mt-4">

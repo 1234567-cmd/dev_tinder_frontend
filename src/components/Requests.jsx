@@ -3,23 +3,18 @@ import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { BASE_URL } from '../utils/constants';
 import { showToast } from '../utils/toastSlice';
+import { Loader } from './Loader';
 
 
 export const Requests = () => {
   const [requests, setRequests] = React.useState([])
+  const [loading, setLoading] = React.useState(true)
+  // { requestId, status } of the review in flight, so only that card's clicked button shows a spinner.
+  const [reviewing, setReviewing] = React.useState(null)
   const dispatch = useDispatch();
 
-  const getRequests = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/user/requests/received`, { withCredentials: true });
-      setRequests(res.data.requests || []);
-    } catch (error) {
-      console.error('Error fetching requests:', error);
-      dispatch(showToast('Could not load your requests. Please try again.', 'error'));
-    }
-  }
-
   const reviewRequest = async (status, requestId) => {
+    setReviewing({ requestId, status });
     try {
       await axios.post(`${BASE_URL}/request/review/${status}/${requestId}`, {}, { withCredentials: true });
       setRequests((prev) => prev.filter((request) => request._id !== requestId));
@@ -27,12 +22,25 @@ export const Requests = () => {
     } catch (error) {
       console.error('Error reviewing request:', error);
       dispatch(showToast('Could not update the request. Please try again.', 'error'));
+    } finally {
+      setReviewing(null);
     }
   }
 
+  // State is only set inside the promise callbacks, so nothing updates synchronously within the effect.
   React.useEffect(() => {
-    getRequests();
-  }, []);
+    axios.get(`${BASE_URL}/user/requests/received`, { withCredentials: true })
+      .then((res) => setRequests(res.data.requests || []))
+      .catch((error) => {
+        console.error('Error fetching requests:', error);
+        dispatch(showToast('Could not load your requests. Please try again.', 'error'));
+      })
+      .finally(() => setLoading(false));
+  }, [dispatch]);
+
+  if (loading) {
+    return <Loader />
+  }
 
   if (requests.length === 0) {
     return (
@@ -99,13 +107,21 @@ export const Requests = () => {
                   <button
                     className="btn btn-outline btn-error flex-1 rounded-full"
                     onClick={() => reviewRequest('rejected', request._id)}
+                    disabled={reviewing?.requestId === request._id}
                   >
+                    {reviewing?.requestId === request._id && reviewing.status === 'rejected' && (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    )}
                     ✕ Reject
                   </button>
                   <button
                     className="btn btn-success flex-1 rounded-full"
                     onClick={() => reviewRequest('accepted', request._id)}
+                    disabled={reviewing?.requestId === request._id}
                   >
+                    {reviewing?.requestId === request._id && reviewing.status === 'accepted' && (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    )}
                     ✓ Accept
                   </button>
                 </div>

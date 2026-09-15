@@ -1,24 +1,29 @@
 import React from 'react'
 import axios from 'axios';
 import { BASE_URL } from '../utils/constants';
+import { Loader } from './Loader';
 
 
 export const Connections = () => {
   const [connections, setConnections] = React.useState([])
+  const [loading, setLoading] = React.useState(true)
 
-  const getConnections = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/user/connections`, { withCredentials: true });
-      console.log('Connections fetched:', res.data.connections);
-      setConnections(res.data.connections || []);
-    } catch (error) {
-      console.error('Error fetching connections:', error);
-    }
-  }
-
+  // State is only set inside the promise callbacks, so nothing updates synchronously within the effect.
   React.useEffect(() => {
-    getConnections();
+    axios.get(`${BASE_URL}/user/connections`, { withCredentials: true })
+      .then((res) => {
+        console.log('Connections fetched:', res.data.connections);
+        setConnections(res.data.connections || []);
+      })
+      .catch((error) => {
+        console.error('Error fetching connections:', error);
+      })
+      .finally(() => setLoading(false));
   }, []);
+
+  if (loading) {
+    return <Loader />
+  }
 
   if (connections.length === 0) {
     return (
