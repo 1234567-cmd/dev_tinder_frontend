@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { createSocketConnection } from '../utils/socket'
 
 // UI only for now — messages live in component state, no API calls yet.
 const dummyMessages = [
@@ -23,6 +24,15 @@ export const Chat = () => {
   const [messages, setMessages] = React.useState(dummyMessages)
   const [draft, setDraft] = React.useState('')
   const bottomRef = React.useRef(null)
+
+  useEffect(() => {
+    if(!loggedInUser?._id || !targetUserId) return
+    const socket = createSocketConnection()
+    socket.emit("joinChat", { loggedUser: loggedInUser?._id, targetUser: targetUserId })
+    return () => {
+      socket.disconnect()
+    }
+  }, [loggedInUser?._id, targetUserId])
 
   React.useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
