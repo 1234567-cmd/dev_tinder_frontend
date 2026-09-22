@@ -1,5 +1,6 @@
 import React from 'react'
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { BASE_URL } from '../utils/constants';
 import { Loader } from './Loader';
 
@@ -71,21 +72,30 @@ export const Connections = () => {
                 </div>
               </figure>
 
-              {(about || skills?.length > 0) && (
-                <div className="card-body gap-3 p-4">
-                  {about && <p className="line-clamp-2 text-sm text-base-content/80">{about}</p>}
-                  {skills?.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {skills.slice(0, 4).map((skill) => (
-                        <span key={skill} className="badge badge-outline badge-sm">{skill}</span>
-                      ))}
-                      {skills.length > 4 && (
-                        <span className="badge badge-ghost badge-sm">+{skills.length - 4}</span>
-                      )}
-                    </div>
-                  )}
+              <div className="card-body gap-3 p-4">
+                {about && <p className="line-clamp-2 text-sm text-base-content/80">{about}</p>}
+                {skills?.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {skills.slice(0, 4).map((skill) => (
+                      <span key={skill} className="badge badge-outline badge-sm">{skill}</span>
+                    ))}
+                    {skills.length > 4 && (
+                      <span className="badge badge-ghost badge-sm">+{skills.length - 4}</span>
+                    )}
+                  </div>
+                )}
+
+                <div className="card-actions">
+                  {/* Hand the card over so the chat page doesn't refetch connections. */}
+                  <Link
+                    to={`/chat/${_id}`}
+                    state={{ targetUser: connection }}
+                    className="btn btn-primary w-full rounded-full"
+                  >
+                    💬 Chat
+                  </Link>
                 </div>
-              )}
+              </div>
             </div>
           )
         })}
