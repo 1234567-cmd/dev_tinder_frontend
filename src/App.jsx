@@ -19,6 +19,8 @@ function App() {
       <BrowserRouter basename="/">
         <Routes>
           <Route path="/" element={<Body />}>
+            {/* Guests land on the feed too; acting on a card sends them to /login. */}
+            <Route index element={<Feed />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={<Profile />} />

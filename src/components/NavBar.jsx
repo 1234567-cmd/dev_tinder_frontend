@@ -43,6 +43,9 @@ export const NavBar = () => {
         <a className="btn btn-ghost text-xl">DevTinder</a>
       </div>
       <div className="flex items-center gap-3 mr-5">
+        {!user && (
+          <Link to="/login" className="btn btn-primary btn-sm">Login</Link>
+        )}
         {user && (
           <p className="hidden sm:block text-base text-base-content/70">
             Welcome, <span className="font-semibold text-base-content">{user.firstName}</span>

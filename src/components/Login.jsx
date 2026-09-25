@@ -2,6 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { addUser } from '../utils/userSlice'
+import { clearFeed } from '../utils/feedSlice'
 import { showToast } from '../utils/toastSlice'
 import { Link, useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../utils/constants'
@@ -25,6 +26,8 @@ export const Login = () => {
       })
       console.log('Login successful:', response.data)
       dispatch(addUser(response.data))
+      // Drop the guest feed so /feed refetches without this user and their connections.
+      dispatch(clearFeed())
       dispatch(showToast(`Welcome back, ${response.data.data.firstName}!`))
       navigate('/feed')
     } catch (error) {

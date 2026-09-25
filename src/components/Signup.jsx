@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../utils/constants'
 import { addUser } from '../utils/userSlice'
+import { clearFeed } from '../utils/feedSlice'
 import { showToast } from '../utils/toastSlice'
 import { PasswordInput } from './PasswordInput'
 
@@ -40,6 +41,8 @@ export const Signup = () => {
         withCredentials: true
       })
       dispatch(addUser(res.data))
+      // Drop the guest feed so /feed refetches without this user.
+      dispatch(clearFeed())
       dispatch(showToast(`Welcome to DevTinder, ${res.data.data.firstName}!`))
       navigate('/feed')
     } catch (error) {

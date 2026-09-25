@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../utils/constants'
 import { removeUserFromFeed } from '../utils/feedSlice'
 import { showToast } from '../utils/toastSlice'
@@ -9,11 +10,19 @@ import { showToast } from '../utils/toastSlice'
 // showActions=false hides Reject/Interested, e.g. for the preview of your own card on the profile page.
 export const UserCard = ({ users, showActions = true }) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const loggedIn = useSelector((state) => Boolean(state.user.user?.data))
   // { userId, status } of the request in flight, so only that card's clicked button shows a spinner.
   const [pending, setPending] = useState(null)
 
   // status must be one the backend accepts for /request/send: "ignored" or "interested".
   const sendRequest = async (status, userId, firstName) => {
+    // Guests can browse the feed but must log in before reacting to anyone.
+    if (!loggedIn) {
+      dispatch(showToast('Please log in to send a request', 'info'))
+      navigate('/login')
+      return
+    }
     setPending({ userId, status })
     try {
       const res = await axios.post(`${BASE_URL}/request/send/${status}/${userId}`, {}, {
